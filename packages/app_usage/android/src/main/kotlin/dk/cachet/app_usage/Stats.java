@@ -41,6 +41,11 @@ public class Stats {
         HashMap<String, List<Double>> usageMap = new HashMap<String, List<Double>>();
 
         for (String packageName : usageStatsMap.keySet()) {
+            // Skip system apps that start with "com.android."
+            if (packageName.startsWith("com.android.")) {
+                continue;
+            }
+
             UsageStats us = usageStatsMap.get(packageName);
             try {
                 long timeMs = us.getTotalTimeInForeground();
@@ -49,14 +54,14 @@ public class Stats {
                 Double timeSecondsStart = new Double(timeMsFirst / 1000);
                 long timeMsStop = us.getLastTimeStamp();
                 Double timeSecondsStop = new Double(timeMsStop / 1000);
-				
-				Double timeSecondsLastUse=0.0;
+
+                Double timeSecondsLastUse = 0.0;
                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
                     long timeMsLastUse = us.getLastTimeForegroundServiceUsed();
                     timeSecondsLastUse = (double) (timeMsLastUse / 1000);
                 }
-				
-                List<Double> listT = Arrays.asList(timeSeconds, timeSecondsStart, timeSecondsStop,timeSecondsLastUse);
+
+                List<Double> listT = Arrays.asList(timeSeconds, timeSecondsStart, timeSecondsStop, timeSecondsLastUse);
                 usageMap.put(packageName, listT);
             } catch (Exception e) {
                 Log.d(TAG, "Getting timeInForeground resulted in an exception");
